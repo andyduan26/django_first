@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
+import { Heart, Search, ShoppingBag, Trash2, User, X } from '@lucide/vue'
 import maisonNayaLogo from './assets/maison-naya-logo-transparent.png'
 
 const routes = [
@@ -115,14 +116,68 @@ const contactForm = reactive({
   requirement: '',
 })
 
+const customerProfile = reactive({
+  name: '',
+  email: '',
+  market: '',
+})
+
 const submitted = ref(false)
 const submittedName = ref('')
 const isSubmitting = ref(false)
 const submitError = ref('')
 const pathname = ref(window.location.pathname)
+const activeUtilityPanel = ref('')
+const searchQuery = ref('')
+const likedProducts = ref(['Noor Pearl Handle Bag'])
+const cartProducts = ref([])
 
 const activeRoute = computed(() => {
   return routes.find((route) => route.path === pathname.value) ?? routes[0]
+})
+
+const searchableItems = computed(() => {
+  return [
+    ...arrivals.map((item) => ({
+      title: item.name,
+      category: 'New Arrival',
+      body: `${item.material}. ${item.note}`,
+      image: item.image,
+      productName: item.name,
+    })),
+    ...bagCategories.map((item) => ({
+      title: item.title,
+      category: 'Bags',
+      body: item.body,
+      image: arrivals[0].image,
+    })),
+    ...jewellery.map((item) => ({
+      title: item.title,
+      category: 'Jewellery',
+      body: item.body,
+      image: arrivals[1].image,
+    })),
+  ]
+})
+
+const searchResults = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase()
+
+  if (!query) {
+    return searchableItems.value.slice(0, 5)
+  }
+
+  return searchableItems.value.filter((item) => {
+    return `${item.title} ${item.category} ${item.body}`.toLowerCase().includes(query)
+  })
+})
+
+const favoriteItems = computed(() => {
+  return arrivals.filter((item) => likedProducts.value.includes(item.name))
+})
+
+const cartItems = computed(() => {
+  return arrivals.filter((item) => cartProducts.value.includes(item.name))
 })
 
 function navigate(event, path) {
@@ -132,6 +187,42 @@ function navigate(event, path) {
     pathname.value = path
     window.scrollTo({ top: 0 })
   }
+}
+
+function toggleUtilityPanel(panel) {
+  activeUtilityPanel.value = activeUtilityPanel.value === panel ? '' : panel
+}
+
+function closeUtilityPanel() {
+  activeUtilityPanel.value = ''
+}
+
+function addToFavorites(productName) {
+  if (!likedProducts.value.includes(productName)) {
+    likedProducts.value.push(productName)
+  }
+}
+
+function removeFromFavorites(productName) {
+  likedProducts.value = likedProducts.value.filter((item) => item !== productName)
+}
+
+function addToCart(productName) {
+  if (!cartProducts.value.includes(productName)) {
+    cartProducts.value.push(productName)
+  }
+}
+
+function removeFromCart(productName) {
+  cartProducts.value = cartProducts.value.filter((item) => item !== productName)
+}
+
+function isFavorite(productName) {
+  return likedProducts.value.includes(productName)
+}
+
+function isInCart(productName) {
+  return cartProducts.value.includes(productName)
 }
 
 async function submitContact() {
@@ -192,18 +283,184 @@ onUnmounted(() => {
         <img class="brand-logo" :src="maisonNayaLogo" alt="Maison Naya" />
       </a>
 
-      <nav class="nav-links" aria-label="Primary navigation">
-        <a
-          v-for="route in routes"
-          :key="route.path"
-          :class="{ active: activeRoute.path === route.path }"
-          :href="route.path"
-          @click="navigate($event, route.path)"
-        >
-          {{ route.label }}
-        </a>
-      </nav>
+      <div class="navigation-cluster">
+        <nav class="nav-links" aria-label="Primary navigation">
+          <a
+            v-for="route in routes"
+            :key="route.path"
+            :class="{ active: activeRoute.path === route.path }"
+            :href="route.path"
+            @click="navigate($event, route.path)"
+          >
+            {{ route.label }}
+          </a>
+        </nav>
+
+        <div class="utility-actions" aria-label="Shop tools">
+          <button
+            type="button"
+            :class="{ active: activeUtilityPanel === 'search' }"
+            aria-label="Search"
+            title="Search"
+            @click="toggleUtilityPanel('search')"
+          >
+            <Search :size="18" :stroke-width="1.6" />
+          </button>
+          <button
+            type="button"
+            :class="{ active: activeUtilityPanel === 'user' }"
+            aria-label="User"
+            title="User"
+            @click="toggleUtilityPanel('user')"
+          >
+            <User :size="18" :stroke-width="1.6" />
+          </button>
+          <button
+            type="button"
+            :class="{ active: activeUtilityPanel === 'favorites' }"
+            aria-label="Likes"
+            title="Likes"
+            @click="toggleUtilityPanel('favorites')"
+          >
+            <Heart :size="18" :stroke-width="1.6" />
+            <span v-if="favoriteItems.length">{{ favoriteItems.length }}</span>
+          </button>
+          <button
+            type="button"
+            :class="{ active: activeUtilityPanel === 'cart' }"
+            aria-label="Cart"
+            title="Cart"
+            @click="toggleUtilityPanel('cart')"
+          >
+            <ShoppingBag :size="18" :stroke-width="1.6" />
+            <span v-if="cartItems.length">{{ cartItems.length }}</span>
+          </button>
+        </div>
+      </div>
     </header>
+
+    <section v-if="activeUtilityPanel" class="utility-panel" aria-label="Selected shop tool">
+      <div class="utility-panel-head">
+        <div>
+          <p class="eyebrow">
+            {{
+              {
+                search: 'Search',
+                user: 'User',
+                favorites: 'Likes',
+                cart: 'Cart',
+              }[activeUtilityPanel]
+            }}
+          </p>
+          <h2>
+            {{
+              {
+                search: 'Find beaded bags and accessories.',
+                user: 'Save buyer details for enquiries.',
+                favorites: 'Review your selected favourites.',
+                cart: 'Prepare an enquiry basket.',
+              }[activeUtilityPanel]
+            }}
+          </h2>
+        </div>
+        <button type="button" aria-label="Close panel" title="Close" @click="closeUtilityPanel">
+          <X :size="20" :stroke-width="1.6" />
+        </button>
+      </div>
+
+      <div v-if="activeUtilityPanel === 'search'" class="search-module">
+        <label>
+          Search collection
+          <input v-model="searchQuery" type="search" placeholder="Pearl clutch, potli, earrings..." />
+        </label>
+        <div class="module-list">
+          <article v-for="item in searchResults" :key="`${item.category}-${item.title}`">
+            <img :src="item.image" :alt="item.title" />
+            <div>
+              <small>{{ item.category }}</small>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.body }}</p>
+              <button
+                v-if="item.productName"
+                type="button"
+                @click="addToFavorites(item.productName)"
+              >
+                Add to likes
+              </button>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <form v-else-if="activeUtilityPanel === 'user'" class="user-module">
+        <label>
+          Name
+          <input v-model="customerProfile.name" type="text" placeholder="Buyer name" />
+        </label>
+        <label>
+          Email
+          <input v-model="customerProfile.email" type="email" placeholder="buyer@example.com" />
+        </label>
+        <label>
+          Market
+          <input v-model="customerProfile.market" type="text" placeholder="USA, Europe, Middle East..." />
+        </label>
+        <p>
+          These details stay in this front-end session and help you prepare a cleaner enquiry before
+          sending the contact form.
+        </p>
+      </form>
+
+      <div v-else-if="activeUtilityPanel === 'favorites'" class="module-list">
+        <article v-if="!favoriteItems.length" class="empty-module">
+          <div>
+            <h3>No liked products yet.</h3>
+            <p>Use the heart action on new arrivals to build a focused reference list.</p>
+          </div>
+        </article>
+        <template v-else>
+          <article v-for="item in favoriteItems" :key="item.name">
+            <img :src="item.image" :alt="item.name" />
+            <div>
+              <small>Liked product</small>
+              <h3>{{ item.name }}</h3>
+              <p>{{ item.note }}</p>
+              <div class="module-actions">
+                <button type="button" @click="addToCart(item.name)">Add to cart</button>
+                <button type="button" aria-label="Remove like" @click="removeFromFavorites(item.name)">
+                  <Trash2 :size="16" :stroke-width="1.6" />
+                </button>
+              </div>
+            </div>
+          </article>
+        </template>
+      </div>
+
+      <div v-else class="module-list">
+        <article v-if="!cartItems.length" class="empty-module">
+          <div>
+            <h3>Your enquiry cart is empty.</h3>
+            <p>Add styles from new arrivals, then send the selection through the contact page.</p>
+          </div>
+        </article>
+        <template v-else>
+          <article v-for="item in cartItems" :key="item.name">
+            <img :src="item.image" :alt="item.name" />
+            <div>
+              <small>Enquiry cart</small>
+              <h3>{{ item.name }}</h3>
+              <p>{{ item.material }}</p>
+              <div class="module-actions">
+                <a href="/contact-us" @click="navigate($event, '/contact-us')">Enquire now</a>
+                <button type="button" aria-label="Remove from cart" @click="removeFromCart(item.name)">
+                  <Trash2 :size="16" :stroke-width="1.6" />
+                </button>
+              </div>
+            </div>
+          </article>
+        </template>
+      </div>
+    </section>
 
     <template v-if="activeRoute.key === 'home'">
       <section class="hero">
@@ -306,6 +563,24 @@ onUnmounted(() => {
               <p>{{ item.material }}</p>
               <small>{{ item.note }}</small>
               <span>{{ item.price }}</span>
+              <div class="product-actions">
+                <button
+                  type="button"
+                  :class="{ selected: isFavorite(item.name) }"
+                  @click="addToFavorites(item.name)"
+                >
+                  <Heart :size="16" :stroke-width="1.6" />
+                  {{ isFavorite(item.name) ? 'Liked' : 'Like' }}
+                </button>
+                <button
+                  type="button"
+                  :class="{ selected: isInCart(item.name) }"
+                  @click="addToCart(item.name)"
+                >
+                  <ShoppingBag :size="16" :stroke-width="1.6" />
+                  {{ isInCart(item.name) ? 'In cart' : 'Cart' }}
+                </button>
+              </div>
             </div>
           </article>
         </div>
