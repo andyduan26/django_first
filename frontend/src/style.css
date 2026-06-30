@@ -50,11 +50,12 @@ img {
 
 .topbar {
   align-items: center;
-  background: #ebe2d2;
-  border-bottom: 1px solid #ddd0bc;
-  display: flex;
-  justify-content: space-between;
-  min-height: 126px;
+  background: #ffffff;
+  border-bottom: 1px solid #e6ded1;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 104px;
   padding: 0 5vw;
   position: sticky;
   top: 0;
@@ -69,7 +70,7 @@ img {
 
 .brand-logo {
   display: block;
-  height: 104px;
+  height: 82px;
   object-fit: contain;
   width: auto;
 }
@@ -78,14 +79,17 @@ img {
   align-items: center;
   display: flex;
   gap: 30px;
+  min-width: 0;
 }
 
 .nav-links a {
-  color: #383630;
+  color: #292721;
   font-size: 13px;
+  font-weight: 700;
   letter-spacing: 0.08em;
-  padding: 30px 0 27px;
+  padding: 39px 0 36px;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .nav-links a.active {
@@ -93,50 +97,48 @@ img {
   color: #8b622d;
 }
 
-.navigation-cluster {
-  align-items: center;
-  display: flex;
-  gap: 34px;
-}
-
 .utility-actions {
   align-items: center;
   display: flex;
-  gap: 10px;
+  gap: 18px;
+  justify-content: flex-end;
 }
 
 .utility-actions button {
   align-items: center;
   background: transparent;
-  border: 1px solid transparent;
-  color: #292721;
+  border: 0;
+  color: #33302b;
   cursor: pointer;
   display: inline-flex;
-  height: 38px;
+  height: 42px;
   justify-content: center;
+  padding: 0;
   position: relative;
-  width: 38px;
+  width: 34px;
 }
 
 .utility-actions button:hover,
 .utility-actions button.active {
-  border-color: #211f1b;
+  color: #000000;
 }
 
 .utility-actions span {
   align-items: center;
-  background: #211f1b;
+  background: #c81916;
+  border-radius: 999px;
   color: #ffffff;
   display: inline-flex;
-  font-size: 10px;
-  height: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  height: 18px;
   justify-content: center;
   line-height: 1;
-  min-width: 16px;
+  min-width: 18px;
   padding: 0 4px;
   position: absolute;
-  right: -5px;
-  top: -5px;
+  right: -8px;
+  top: 1px;
 }
 
 .utility-panel {
@@ -146,7 +148,7 @@ img {
   gap: 34px;
   padding: 42px 5vw;
   position: sticky;
-  top: 126px;
+  top: 104px;
   z-index: 18;
 }
 
@@ -793,27 +795,29 @@ h3 {
 
 @media (max-width: 980px) {
   .topbar {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
     gap: 18px;
+    grid-template-columns: 1fr auto;
     padding-bottom: 18px;
     padding-top: 18px;
+  }
+
+  .brand {
+    grid-column: 1 / 2;
+  }
+
+  .utility-actions {
+    grid-column: 2 / 3;
+    grid-row: 1;
+    justify-content: flex-end;
   }
 
   .nav-links {
     flex-wrap: wrap;
     gap: 0 22px;
-  }
-
-  .navigation-cluster {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 14px;
+    grid-column: 1 / -1;
+    grid-row: 2;
     width: 100%;
-  }
-
-  .utility-actions {
-    justify-content: flex-start;
   }
 
   .utility-panel {
@@ -839,7 +843,7 @@ h3 {
   }
 
   .brand-logo {
-    height: 92px;
+    height: 74px;
   }
 
   .hero,

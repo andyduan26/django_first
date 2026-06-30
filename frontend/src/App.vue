@@ -129,7 +129,7 @@ const submitError = ref('')
 const pathname = ref(window.location.pathname)
 const activeUtilityPanel = ref('')
 const searchQuery = ref('')
-const likedProducts = ref(['Noor Pearl Handle Bag'])
+const likedProducts = ref([])
 const cartProducts = ref([])
 
 const activeRoute = computed(() => {
@@ -283,59 +283,57 @@ onUnmounted(() => {
         <img class="brand-logo" :src="maisonNayaLogo" alt="Maison Naya" />
       </a>
 
-      <div class="navigation-cluster">
-        <nav class="nav-links" aria-label="Primary navigation">
-          <a
-            v-for="route in routes"
-            :key="route.path"
-            :class="{ active: activeRoute.path === route.path }"
-            :href="route.path"
-            @click="navigate($event, route.path)"
-          >
-            {{ route.label }}
-          </a>
-        </nav>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a
+          v-for="route in routes"
+          :key="route.path"
+          :class="{ active: activeRoute.path === route.path }"
+          :href="route.path"
+          @click="navigate($event, route.path)"
+        >
+          {{ route.label }}
+        </a>
+      </nav>
 
-        <div class="utility-actions" aria-label="Shop tools">
-          <button
-            type="button"
-            :class="{ active: activeUtilityPanel === 'search' }"
-            aria-label="Search"
-            title="Search"
-            @click="toggleUtilityPanel('search')"
-          >
-            <Search :size="18" :stroke-width="1.6" />
-          </button>
-          <button
-            type="button"
-            :class="{ active: activeUtilityPanel === 'user' }"
-            aria-label="User"
-            title="User"
-            @click="toggleUtilityPanel('user')"
-          >
-            <User :size="18" :stroke-width="1.6" />
-          </button>
-          <button
-            type="button"
-            :class="{ active: activeUtilityPanel === 'favorites' }"
-            aria-label="Likes"
-            title="Likes"
-            @click="toggleUtilityPanel('favorites')"
-          >
-            <Heart :size="18" :stroke-width="1.6" />
-            <span v-if="favoriteItems.length">{{ favoriteItems.length }}</span>
-          </button>
-          <button
-            type="button"
-            :class="{ active: activeUtilityPanel === 'cart' }"
-            aria-label="Cart"
-            title="Cart"
-            @click="toggleUtilityPanel('cart')"
-          >
-            <ShoppingBag :size="18" :stroke-width="1.6" />
-            <span v-if="cartItems.length">{{ cartItems.length }}</span>
-          </button>
-        </div>
+      <div class="utility-actions" aria-label="Shop tools">
+        <button
+          type="button"
+          :class="{ active: activeUtilityPanel === 'search' }"
+          aria-label="Search"
+          title="Search"
+          @click="toggleUtilityPanel('search')"
+        >
+          <Search :size="24" :stroke-width="1.7" />
+        </button>
+        <button
+          type="button"
+          :class="{ active: activeUtilityPanel === 'user' }"
+          aria-label="User"
+          title="User"
+          @click="toggleUtilityPanel('user')"
+        >
+          <User :size="23" :stroke-width="1.7" />
+        </button>
+        <button
+          type="button"
+          :class="{ active: activeUtilityPanel === 'favorites' }"
+          aria-label="Likes"
+          title="Likes"
+          @click="toggleUtilityPanel('favorites')"
+        >
+          <Heart :size="25" :stroke-width="1.7" />
+          <span>{{ favoriteItems.length }}</span>
+        </button>
+        <button
+          type="button"
+          :class="{ active: activeUtilityPanel === 'cart' }"
+          aria-label="Cart"
+          title="Cart"
+          @click="toggleUtilityPanel('cart')"
+        >
+          <ShoppingBag :size="24" :stroke-width="1.7" />
+          <span v-if="cartItems.length">{{ cartItems.length }}</span>
+        </button>
       </div>
     </header>
 
